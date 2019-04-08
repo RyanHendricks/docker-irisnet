@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  irisnet:
+    build: .
+    container_name: iris-node
+    ports:
+      - "26656:26656"
+      - "26657:26657"
+      - "26658:26658"
+      - "6060:6060"
+    restart: always
+    volumes:
+      - ./data/irisnet:/data/irisnet
+      # - ./data/config:/.iris/config
+      # - ./data/chaindata:/chaindata
