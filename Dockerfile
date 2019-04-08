@@ -19,14 +19,15 @@ RUN mkdir $IRISHOME
 WORKDIR $IRISHOME
 RUN rm -r /tmp/iris
 
-COPY scripts/config.sh $IRISHOME
+COPY scripts/config.sh $IRISHOME/config.sh
 RUN chmod u+x config.sh
 RUN sh config.sh
+RUN rm $IRISHOME/config.sh
 
+EXPOSE 26656
+EXPOSE 26657
 EXPOSE 26658
 EXPOSE 6060
-EXPOSE 26657
-EXPOSE 26656
 
 ADD ./scripts/start_iris.sh /usr/local/bin/start_iris.sh
 RUN chmod u+x /usr/local/bin/start_iris.sh
