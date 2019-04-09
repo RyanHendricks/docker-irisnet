@@ -11,6 +11,6 @@ services:
       - "6060:6060"
     restart: always
     volumes:
-      - ./data/irisnet:/data/irisnet
-      # - ./data/config:/.iris/config
+      # - ./data/irisnet:/data/irisnet
+      - ./data:/.iris/data
       # - ./data/chaindata:/chaindata
