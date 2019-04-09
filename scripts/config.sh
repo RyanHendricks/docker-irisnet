@@ -19,7 +19,7 @@ cat > config.toml << EOF
 proxy_app = "tcp://127.0.0.1:26658"
 
 # A custom human readable name for this node
-moniker = $MONIKER
+moniker = appealtoheaven
 
 # If this node is many blocks behind the tip of the chain, FastSync
 # allows them to catchup quickly by downloading blocks in parallel
@@ -122,7 +122,7 @@ laddr = "tcp://0.0.0.0:26656"
 # If empty, will use the same port as the laddr,
 # and will introspect on the listener or use UPnP
 # to figure out the address.
-external_address = $PUBLIC_IP
+external_address = "$PUBLIC_IP"
 
 # Comma separated list of seed nodes to connect to
 seeds = "6a6de770deaa4b8c061dffd82e9c7f4d40c2165d@seed-1.mainnet.irisnet.org:26656,a17d7923293203c64ba75723db4d5f28e642f469@seed-2.mainnet.irisnet.org:26656"
