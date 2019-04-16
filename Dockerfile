@@ -2,7 +2,6 @@ FROM ubuntu:16.04
 
 ENV IRISHOME=/.iris
 ENV CHAIN_ID=irishub
-ENV MONIKER=appealtoheaven
 ENV VERSION=0.13.0-rc0
 ENV NETWORK=mainnet
 
@@ -19,17 +18,19 @@ RUN mkdir $IRISHOME
 WORKDIR $IRISHOME
 RUN rm -r /tmp/iris
 
-COPY scripts/config.sh $IRISHOME/config.sh
-RUN chmod u+x config.sh
-RUN sh config.sh
-RUN rm $IRISHOME/config.sh
+COPY scripts/config.sh $IRISHOME/entrypoint.sh
+RUN chmod u+x entrypoint.sh
+# RUN sh config.sh
+# RUN rm $IRISHOME/config.sh
 
 EXPOSE 26656
 EXPOSE 26657
 EXPOSE 26658
 EXPOSE 6060
 
+STOPSIGNAL SIGINT
+
+ENTRYPOINT [ "entrypoint.sh" ]
 ADD ./scripts/start_iris.sh /usr/local/bin/start_iris.sh
 RUN chmod u+x /usr/local/bin/start_iris.sh
 CMD [ "/usr/local/bin/start_iris.sh" ]
-

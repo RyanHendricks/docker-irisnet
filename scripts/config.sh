@@ -1,11 +1,12 @@
 #!/bin/sh
 
 # mkdir /.iris
+MONIKER=${MONIKER:-iris_moniker}
 iris init --moniker=$MONIKER --home=$IRISHOME --chain-id=$CHAIN_ID
 cd $IRISHOME/config/
 rm genesis.json
 rm config.toml
-wget https://raw.githubusercontent.com/irisnet/betanet/master/config/genesis.json
+wget ${GENESIS_URL:-https://raw.githubusercontent.com/irisnet/betanet/master/config/genesis.json}
 
 
 cat > config.toml << EOF
@@ -19,7 +20,7 @@ cat > config.toml << EOF
 proxy_app = "tcp://127.0.0.1:26658"
 
 # A custom human readable name for this node
-moniker = "appealtoheaven"
+moniker = "${MONIKER}"
 
 # If this node is many blocks behind the tip of the chain, FastSync
 # allows them to catchup quickly by downloading blocks in parallel
