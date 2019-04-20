@@ -1,3 +1,5 @@
+![https://gitlab.com/appealtoheavenllc/docker-irisnet](https://gitlab.com/appealtoheavenllc/docker-irisnet/badges/master/pipeline.svg)
+
 # Docker IrisNet
 
 ## Getting Started
