@@ -155,7 +155,7 @@ addr_book_strict = false
 max_num_inbound_peers = 40
 
 # Maximum number of outbound peers to connect to, excluding persistent peers
-max_num_outbound_peers = 10
+max_num_outbound_peers = 40
 
 # Time to wait before flushing messages out on the connection
 flush_throttle_timeout = "100ms"
@@ -164,10 +164,10 @@ flush_throttle_timeout = "100ms"
 max_packet_msg_payload_size = 2048
 
 # Rate at which packets can be sent, in bytes/second
-send_rate = 10240000
+send_rate = 40960000
 
 # Rate at which packets can be received, in bytes/second
-recv_rate = 10240000
+recv_rate = 40960000
 
 # Set true to enable the peer-exchange reactor
 pex = true
@@ -199,7 +199,7 @@ wal_dir = ""
 size = 5000
 
 # size of the cache (used to filter transactions we saw earlier)
-cache_size = 10000
+cache_size = 30000
 
 ##### consensus configuration options #####
 [consensus]

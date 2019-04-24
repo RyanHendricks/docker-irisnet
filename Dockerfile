@@ -34,8 +34,8 @@ RUN mkdir -p /tmp/bin
 WORKDIR /tmp/bin
 
 # Copy over binaries from the build-env
-COPY --from=build-env /go/bin/iris /tmp
-COPY --from=build-env /go/bin/iriscli /tmp
+COPY --from=build-env /go/bin/iris /tmp/bin
+COPY --from=build-env /go/bin/iriscli /tmp/bin
 RUN install -m 0755 -o root -g root -t /usr/local/bin `find . -maxdepth 1 -executable -type f`
 
 RUN rm -r /tmp/bin
