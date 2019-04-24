@@ -1,13 +1,23 @@
 #!/bin/sh
 
+
+# exit script on any error
+set -e
+echo "setting up initial configurations"
+
+
 # mkdir /.iris
-MONIKER=${MONIKER:-iris_moniker}
-iris init --moniker=$MONIKER --home=$IRISHOME --chain-id=$CHAIN_ID
-cd $IRISHOME/config/
+iris init --moniker=${MONIKER:-iris_moniker} --home=${IRIS_HOME:-/.iris} --chain-id=${CHAIN_ID:-irishub}
+cd $IRIS_HOME/config/
+
 rm genesis.json
 rm config.toml
-wget ${GENESIS_URL:-https://raw.githubusercontent.com/irisnet/betanet/master/config/genesis.json}
 
+if [ ! -z "$GENESIS_URL" ]; then
+    wget $GENESIS_URL
+else
+    wget https://raw.githubusercontent.com/irisnet/betanet/master/config/genesis.json
+fi
 
 cat > config.toml << EOF
 # This is a TOML config file.
@@ -20,7 +30,7 @@ cat > config.toml << EOF
 proxy_app = "tcp://127.0.0.1:26658"
 
 # A custom human readable name for this node
-moniker = "${MONIKER}"
+moniker = "${MONIKER:-iris_moniker}"
 
 # If this node is many blocks behind the tip of the chain, FastSync
 # allows them to catchup quickly by downloading blocks in parallel
@@ -266,4 +276,5 @@ max_open_connections = 0
 namespace = "tendermint"
 
 EOF
-# config.toml $IRISHOME/config/config.toml
+
+iris start --home=$IRISHOME
