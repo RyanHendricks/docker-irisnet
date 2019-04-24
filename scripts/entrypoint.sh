@@ -277,4 +277,4 @@ namespace = "tendermint"
 
 EOF
 
-iris start --home=$IRISHOME
+iris start --home=$IRIS_HOME

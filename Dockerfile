@@ -29,12 +29,16 @@ ENV IRIS_HOME=/.iris
 # Install ca-certificates
 RUN apk add --update ca-certificates
 
-WORKDIR /tmp
+RUN mkdir -p /tmp/bin
+
+WORKDIR /tmp/bin
 
 # Copy over binaries from the build-env
 COPY --from=build-env /go/bin/iris /tmp
 COPY --from=build-env /go/bin/iriscli /tmp
 RUN install -m 0755 -o root -g root -t /usr/local/bin `find . -maxdepth 1 -executable -type f`
+
+RUN rm -r /tmp/bin
 
 WORKDIR $IRIS_HOME
 
