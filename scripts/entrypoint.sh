@@ -5,19 +5,21 @@
 set -e
 echo "setting up initial configurations"
 
+if [ ! -d "$IRIS_HOME/data" ];
+then
 
-# mkdir /.iris
-iris init --moniker=${MONIKER:-iris_moniker} --home=${IRIS_HOME:-/.iris} --chain-id=${CHAIN_ID:-irishub}
-cd $IRIS_HOME/config/
+    iris init --moniker=${MONIKER:-iris_moniker} --home=${IRIS_HOME:-/.iris} --chain-id=${CHAIN_ID:-irishub}
 
-rm genesis.json
-rm config.toml
+    cd $IRIS_HOME/config/
 
-if [ ! -z "$GENESIS_URL" ]; then
-    wget $GENESIS_URL
-else
-    wget https://raw.githubusercontent.com/irisnet/betanet/master/config/genesis.json
-fi
+    rm genesis.json
+    rm config.toml
+
+    if [ ! -z "$GENESIS_URL" ]; then
+        wget $GENESIS_URL
+    else
+        wget https://raw.githubusercontent.com/irisnet/betanet/master/config/genesis.json
+    fi
 
 cat > config.toml << EOF
 # This is a TOML config file.
@@ -261,7 +263,7 @@ index_all_tags = false
 # When true, Prometheus metrics are served under /metrics on
 # PrometheusListenAddr.
 # Check out the documentation for the list of available metrics.
-prometheus = true
+prometheus = false
 
 # Address to listen for Prometheus collector(s) connections
 prometheus_listen_addr = ":26660"
@@ -276,5 +278,7 @@ max_open_connections = 0
 namespace = "tendermint"
 
 EOF
+
+fi
 
 iris start --home=$IRIS_HOME
