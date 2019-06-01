@@ -3,7 +3,7 @@ FROM golang:alpine AS build-env
 # Modified from original cosmos-sdk Dockerfile
 
 ENV PACKAGES curl make git libc-dev bash gcc linux-headers eudev-dev
-ENV VERSION=v0.13.1
+ENV VERSION=v0.14.1
 
 # Set up dependencies
 RUN apk add --no-cache $PACKAGES
@@ -19,13 +19,12 @@ RUN git checkout $VERSION
 # Install minimum necessary dependencies, build Cosmos SDK, remove packages
 RUN make
 
-# Final image
+# # Final image
 FROM alpine:edge
 
-ENV IRIS_HOME=/.iris
 
 # Install ca-certificates
-RUN apk add --update ca-certificates
+RUN apk add --no-cache --update ca-certificates supervisor
 
 RUN mkdir -p /tmp/bin
 
@@ -34,17 +33,25 @@ WORKDIR /tmp/bin
 # Copy over binaries from the build-env
 COPY --from=build-env /go/bin/iris /tmp/bin
 COPY --from=build-env /go/bin/iriscli /tmp/bin
-RUN install -m 0755 -o root -g root -t /usr/local/bin iris
-RUN install -m 0755 -o root -g root -t /usr/local/bin iriscli
+COPY --from=build-env /go/bin/iristool /tmp/bin
+COPY --from=build-env /go/bin/irislcd /tmp/bin
 
+RUN install -m 0755 -o root -g root -t /usr/local/bin `find . -maxdepth 1 -executable -type f`
 
 RUN rm -r /tmp/bin
 
+# Add supervisor configuration files
+# RUN mkdir -p /etc/supervisor/conf.d/
+# COPY /supervisor/supervisord.conf /etc/supervisor/supervisord.conf 
+# COPY /supervisor/conf.d/* /etc/supervisor/conf.d/
+
+ENV IRIS_HOME=/.iris
+WORKDIR $IRIS_HOME
 
 EXPOSE 26656 26657 26658
 EXPOSE 1317
 
-COPY ./scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+ADD ./scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod u+x /usr/local/bin/entrypoint.sh
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
 
