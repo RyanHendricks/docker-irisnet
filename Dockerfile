@@ -35,15 +35,18 @@ COPY --from=build-env /go/bin/iris /tmp/bin
 COPY --from=build-env /go/bin/iriscli /tmp/bin
 COPY --from=build-env /go/bin/iristool /tmp/bin
 COPY --from=build-env /go/bin/irislcd /tmp/bin
+RUN install -m 0755 -o root -g root -t /usr/local/bin iris
+RUN install -m 0755 -o root -g root -t /usr/local/bin iriscli
+RUN install -m 0755 -o root -g root -t /usr/local/bin iristool
+RUN install -m 0755 -o root -g root -t /usr/local/bin irislcd
 
-RUN install -m 0755 -o root -g root -t /usr/local/bin `find . -maxdepth 1 -executable -type f`
 
 RUN rm -r /tmp/bin
 
 # Add supervisor configuration files
-# RUN mkdir -p /etc/supervisor/conf.d/
-# COPY /supervisor/supervisord.conf /etc/supervisor/supervisord.conf 
-# COPY /supervisor/conf.d/* /etc/supervisor/conf.d/
+RUN mkdir -p /etc/supervisor/conf.d/
+COPY /supervisor/supervisord.conf /etc/supervisor/supervisord.conf 
+COPY /supervisor/conf.d/* /etc/supervisor/conf.d/
 
 ENV IRIS_HOME=/.iris
 WORKDIR $IRIS_HOME
