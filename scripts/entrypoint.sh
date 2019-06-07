@@ -6,6 +6,8 @@ set -e
 echo "setting up initial configurations"
 
 
+if [ ! -f "$IRIS_HOME/config/config.toml" ];
+then
 # mkdir /.iris
 iris init --moniker=${MONIKER:-iris_moniker} --home=${IRIS_HOME:-/.iris} --chain-id=${CHAIN_ID:-irishub}
 cd $IRIS_HOME/config/
@@ -276,5 +278,5 @@ max_open_connections = 0
 namespace = "tendermint"
 
 EOF
-
-iris start --home=$IRIS_HOME
+fi
+exec supervisord --nodaemon --configuration /etc/supervisor/supervisord.conf
