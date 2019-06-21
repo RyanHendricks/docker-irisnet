@@ -6,8 +6,7 @@ set -e
 echo "setting up initial configurations"
 
 
-if [ ! -f "$IRIS_HOME/config/config.toml" ];
-then
+if [ ! -f "$IRIS_HOME/config/config.toml" ]; then
   # mkdir /.iris
   iris init --moniker=${MONIKER:-iris_moniker} --home=${IRIS_HOME:-/.iris} --chain-id=${CHAIN_ID:-irishub}
   cd $IRIS_HOME/config/
@@ -17,7 +16,7 @@ then
 
   if [ ! -z "$GENESIS_URL" ]; then
       wget $GENESIS_URL
-  else
+    else
       wget https://raw.githubusercontent.com/irisnet/betanet/master/config/genesis.json
   fi
 
@@ -283,11 +282,11 @@ EOF
 
   cd $IRIS_HOME
 
-    if [ "$BOOTSTRAP" == "TRUE" ] then
+    if [ "$BOOTSTRAP" == "TRUE" ]; then
       wget https://storage.googleapis.com/a2h-node-bootstraps/$CHAIN_ID.tar.lz4
       lz4 -d -v --rm $CHAIN_ID.tar.lz4 | tar xf -
     fi
 
-  fi
+fi
 
 exec supervisord --nodaemon --configuration /etc/supervisor/supervisord.conf
