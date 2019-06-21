@@ -8,18 +8,18 @@ echo "setting up initial configurations"
 
 if [ ! -f "$IRIS_HOME/config/config.toml" ];
 then
-# mkdir /.iris
-iris init --moniker=${MONIKER:-iris_moniker} --home=${IRIS_HOME:-/.iris} --chain-id=${CHAIN_ID:-irishub}
-cd $IRIS_HOME/config/
+  # mkdir /.iris
+  iris init --moniker=${MONIKER:-iris_moniker} --home=${IRIS_HOME:-/.iris} --chain-id=${CHAIN_ID:-irishub}
+  cd $IRIS_HOME/config/
 
-rm genesis.json
-rm config.toml
+  rm genesis.json
+  rm config.toml
 
-if [ ! -z "$GENESIS_URL" ]; then
-    wget $GENESIS_URL
-else
-    wget https://raw.githubusercontent.com/irisnet/betanet/master/config/genesis.json
-fi
+  if [ ! -z "$GENESIS_URL" ]; then
+      wget $GENESIS_URL
+  else
+      wget https://raw.githubusercontent.com/irisnet/betanet/master/config/genesis.json
+  fi
 
 cat > config.toml << EOF
 # This is a TOML config file.
@@ -263,7 +263,7 @@ index_all_tags = false
 # When true, Prometheus metrics are served under /metrics on
 # PrometheusListenAddr.
 # Check out the documentation for the list of available metrics.
-prometheus = true
+prometheus = false
 
 # Address to listen for Prometheus collector(s) connections
 prometheus_listen_addr = ":26660"
@@ -278,5 +278,16 @@ max_open_connections = 0
 namespace = "tendermint"
 
 EOF
-fi
+
+
+
+  cd $IRIS_HOME
+
+    if [ "$BOOTSTRAP" == "TRUE" ] then
+      wget https://storage.googleapis.com/a2h-node-bootstraps/$CHAIN_ID.tar.lz4
+      lz4 -d -v --rm $CHAIN_ID.tar.lz4 | tar xf -
+    fi
+
+  fi
+
 exec supervisord --nodaemon --configuration /etc/supervisor/supervisord.conf
