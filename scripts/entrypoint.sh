@@ -28,7 +28,7 @@ cat > config.toml << EOF
 
 # TCP or UNIX socket address of the ABCI application,
 # or the name of an ABCI application compiled in with the Tendermint binary
-proxy_app = "tcp://127.0.0.1:26658"
+proxy_app = "tcp://127.0.0.1:${PROXY_APP_PORT:-26658}"
 
 # A custom human readable name for this node
 moniker = "${MONIKER:-iris_moniker}"
@@ -86,12 +86,12 @@ filter_peers = false
 [rpc]
 
 # TCP or UNIX socket address for the RPC server to listen on
-laddr = "tcp://0.0.0.0:26657"
+laddr = "tcp://0.0.0.0:${RPC_LADDR_PORT:-26657}"
 
 # A list of origins a cross-domain request can be executed from
 # Default value '[]' disables cors support
 # Use '["*"]' to allow any origin
-cors_allowed_origins = ["*"]
+cors_allowed_origins = ["${CORS_ALLOWED_ORIGINS:-*}"]
 
 # A list of methods the client is allowed to use with cross-domain requests
 cors_allowed_methods = ["HEAD", "GET", "POST", ]
@@ -128,7 +128,8 @@ max_open_connections = 900
 [p2p]
 
 # Address to listen for incoming connections
-laddr = "tcp://0.0.0.0:26656"
+laddr = "tcp://0.0.0.0:${CONNECTIONS_LADDR_PORT:-26656}"
+
 
 # Address to advertise to peers for them to dial
 # If empty, will use the same port as the laddr,
@@ -180,7 +181,7 @@ pex = true
 seed_mode = false
 
 # Comma separated list of peer IDs to keep private (will not be gossiped to other peers)
-private_peer_ids = ""
+private_peer_ids = "${PRIVATE_PEER_IDS:-}"
 
 # Toggle to disable guard against peers connecting from the same ip.
 allow_duplicate_ip = false
@@ -262,22 +263,21 @@ index_all_tags = false
 # When true, Prometheus metrics are served under /metrics on
 # PrometheusListenAddr.
 # Check out the documentation for the list of available metrics.
-prometheus = false
+prometheus = ${PROMETHEUS:-false}
 
 # Address to listen for Prometheus collector(s) connections
-prometheus_listen_addr = ":26660"
+prometheus_listen_addr = ":${PROMETHEUS_PORT:-26660}"
 
 # Maximum number of simultaneous connections.
 # If you want to accept a larger number than the default, make sure
 # you increase your OS limits.
 # 0 - unlimited.
-max_open_connections = 0
+max_open_connections = ${MAX_OPEN_CONNECTIONS:-9}
 
 # Instrumentation namespace
-namespace = "tendermint"
+namespace = "${INSTRUMENTATION_NAMESPACE:-tendermint}"
 
 EOF
-
 
 
   cd $IRIS_HOME
@@ -289,4 +289,23 @@ EOF
 
 fi
 
+
+if [ ! -z "$LCD_PORT" ]; then
+    rm /etc/supervisor/conf.d/supervisor-irislcd.conf
+    cd /etc/supervisor/conf.d/
+
+cat > supervisor-irislcd.conf << EOF
+[program:irislcd]
+command=irislcd start --laddr tcp://0.0.0.0:${LCD_PORT:-1317} --home=${IRIS_HOME:-/.iris} --chain-id=${CHAIN_ID:-irishub} --trust-node --node=tcp://localhost:${RPC_LADDR_PORT:-26657} --cors="${CORS_ALLOWED_ORIGINS:-*}"
+redirect_stderr=true
+EOF
+
+fi
+
+
+
+
 exec supervisord --nodaemon --configuration /etc/supervisor/supervisord.conf
+
+
+
