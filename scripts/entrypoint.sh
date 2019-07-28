@@ -36,7 +36,7 @@ moniker = "${MONIKER:-iris_moniker}"
 # If this node is many blocks behind the tip of the chain, FastSync
 # allows them to catchup quickly by downloading blocks in parallel
 # and verifying their commits
-fast_sync = true
+fast_sync = ${FAST_SYNC:-true}
 
 # If the blockchain is deprecated, run node with Deprecated will
 # work in query only mode. Consensus engine and p2p gossip will be
@@ -44,13 +44,13 @@ fast_sync = true
 deprecated = false
 
 # Database backend: leveldb | memdb | cleveldb
-db_backend = "leveldb"
+db_backend = "${DB_BACKEND:-leveldb}"
 
 # Database directory
-db_dir = "data"
+db_dir = "${DB_DIR:-data}"
 
 # Output level for logging, including package level options
-log_level = "main:info,state:info,*:error"
+log_level = "${LOG_LEVEL:-main:info,state:info,*:error}"
 
 # Output format: 'plain' (colored text) or 'json'
 log_format = "plain"
@@ -58,23 +58,30 @@ log_format = "plain"
 ##### additional base config options #####
 
 # Path to the JSON file containing the initial validator set and other meta data
-genesis_file = "config/genesis.json"
+genesis_file = "${GENESIS_FILE:-config/genesis.json}"
 
+## WILL BE DEPRECATED ##
 # Path to the JSON file containing the private key to use as a validator in the consensus protocol
 priv_validator_file = "config/priv_validator.json"
 
+# Path to the JSON file containing the private key to use as a validator in the consensus protocol
+# priv_validator_key_file = "${PRIV_VALIDATOR_KEY_FILE:-config/priv_validator_key.json}"
+
+# Path to the JSON file containing the last sign state of a validator
+# priv_validator_state_file = "${PRIV_VALIDATOR_KEY_FILE:-data/priv_validator_state.json}"
+
 # TCP or UNIX socket address for Tendermint to listen on for
 # connections from an external PrivValidator process
-priv_validator_laddr = ""
+priv_validator_laddr = "${PRIV_VALIDATOR_LADDR:-}"
 
 # Path to the JSON file containing the private key to use for node authentication in the p2p protocol
-node_key_file = "config/node_key.json"
+node_key_file = "${NODE_KEY_FILE:-config/node_key.json}"
 
 # Mechanism to connect to the ABCI application: socket | grpc
-abci = "socket"
+abci = "${ABCI:-socket}"
 
 # TCP or UNIX socket address for the profiling server to listen on
-prof_laddr = "localhost:6060"
+prof_laddr = "${PROF_LADDR:-localhost:6060}"
 
 # If true, query the ABCI app on connecting to a new peer
 # so the app can decide if we should keep the connection or not
@@ -101,7 +108,7 @@ cors_allowed_headers = ["Origin", "Accept", "Content-Type", "X-Requested-With", 
 
 # TCP or UNIX socket address for the gRPC server to listen on
 # NOTE: This server only supports /broadcast_tx_commit
-grpc_laddr = ""
+grpc_laddr = "${GRPC_LADDR:-}"
 
 # Maximum number of simultaneous connections.
 # Does not include RPC (HTTP&WebSocket) connections. See max_open_connections
@@ -110,10 +117,10 @@ grpc_laddr = ""
 # 0 - unlimited.
 # Should be < {ulimit -Sn} - {MaxNumInboundPeers} - {MaxNumOutboundPeers} - {N of wal, db and other open files}
 # 1024 - 40 - 10 - 50 = 924 = ~900
-grpc_max_open_connections = 900
+grpc_max_open_connections = ${GRPC_MAX_OPEN_CONNECTIONS:-900}
 
 # Activate unsafe RPC commands like /dial_seeds and /unsafe_flush_mempool
-unsafe = false
+unsafe = ${UNSAFE:-false}
 
 # Maximum number of simultaneous connections (including WebSocket).
 # Does not include gRPC connections. See grpc_max_open_connections
@@ -122,7 +129,7 @@ unsafe = false
 # 0 - unlimited.
 # Should be < {ulimit -Sn} - {MaxNumInboundPeers} - {MaxNumOutboundPeers} - {N of wal, db and other open files}
 # 1024 - 40 - 10 - 50 = 924 = ~900
-max_open_connections = 900
+max_open_connections = ${GRPC_MAX_OPEN_CONNECTIONS:-900}
 
 ##### peer to peer configuration options #####
 [p2p]
@@ -135,97 +142,106 @@ laddr = "tcp://0.0.0.0:${CONNECTIONS_LADDR_PORT:-26656}"
 # If empty, will use the same port as the laddr,
 # and will introspect on the listener or use UPnP
 # to figure out the address.
-external_address = ""
+external_address = "${EXTERNAL_ADDRESS:-}"
 
 # Comma separated list of seed nodes to connect to
-seeds = "6a6de770deaa4b8c061dffd82e9c7f4d40c2165d@seed-1.mainnet.irisnet.org:26656,a17d7923293203c64ba75723db4d5f28e642f469@seed-2.mainnet.irisnet.org:26656"
+seeds = "${SEEDS:-6a6de770deaa4b8c061dffd82e9c7f4d40c2165d@seed-1.mainnet.irisnet.org:26656,a17d7923293203c64ba75723db4d5f28e642f469@seed-2.mainnet.irisnet.org:26656}"
 
 # Comma separated list of nodes to keep persistent connections to
-persistent_peers = ""
+persistent_peers = "${PERSISTENT_PEERS:-}"
 
 # UPNP port forwarding
-upnp = false
+upnp = ${UPNP:-false}
 
 # Path to address book
-addr_book_file = "config/addrbook.json"
+addr_book_file = "${ADDR_BOOK_FILE:-config/addrbook.json}"
 
 # Set true for strict address routability rules
 # Set false for private or local networks
 addr_book_strict = false
 
+# Set true for strict address routability rules
+# Set false for private or local networks
+addr_book_strict = ${ADDR_BOOK_STRICT:-false}
+
 # Maximum number of inbound peers
-max_num_inbound_peers = 40
+max_num_inbound_peers = ${MAX_NUM_INBOUND_PEERS:-40}
 
 # Maximum number of outbound peers to connect to, excluding persistent peers
-max_num_outbound_peers = 40
+max_num_outbound_peers = ${MAX_NUM_OUTBOUND_PEERS:-40}
 
 # Time to wait before flushing messages out on the connection
-flush_throttle_timeout = "100ms"
+flush_throttle_timeout = "${FLUSH_THROTTLE_TIMEOUT:-100ms}"
 
 # Maximum size of a message packet payload, in bytes
-max_packet_msg_payload_size = 2048
+max_packet_msg_payload_size = ${MAX_PACKET_MSG_PAYLOAD_SIZE:-1000}
 
 # Rate at which packets can be sent, in bytes/second
-send_rate = 40960000
+send_rate = ${SEND_RATE:-10280000}
 
 # Rate at which packets can be received, in bytes/second
-recv_rate = 40960000
+recv_rate = ${RECV_RATE:-10280000}
 
 # Set true to enable the peer-exchange reactor
-pex = true
+pex = ${PEX:-true}
 
 # Seed mode, in which node constantly crawls the network and looks for
 # peers. If another node asks it for addresses, it responds and disconnects.
 #
 # Does not work if the peer-exchange reactor is disabled.
-seed_mode = false
+seed_mode = ${SEED_MODE:-false}
 
 # Comma separated list of peer IDs to keep private (will not be gossiped to other peers)
 private_peer_ids = "${PRIVATE_PEER_IDS:-}"
 
 # Toggle to disable guard against peers connecting from the same ip.
-allow_duplicate_ip = false
+allow_duplicate_ip = ${ALLOW_DUPLICATE_IP:-true}
 
 # Peer connection configuration.
-handshake_timeout = "20s"
-dial_timeout = "3s"
+handshake_timeout = "${HANDSHAKE_TIMEOUT:-20s}"
+dial_timeout = "${DIAL_TIMEOUT:-3s}"
 
 ##### mempool configuration options #####
 [mempool]
 
-recheck = true
-broadcast = true
-wal_dir = ""
+recheck = ${RECHECK:-true}
+broadcast = ${BROADCAST:-true}
+wal_dir = "${WAL_DIR}"
 
 # size of the mempool
-size = 5000
+size = ${SIZE_OF_MEMPOOL:-5000}
+
+# This only accounts for raw transactions (e.g. given 1MB transactions and
+# max_txs_bytes=5MB, mempool will only accept 5 transactions).
+max_txs_bytes = ${MAX_TXS_BYTES:-1073741824}
+
 
 # size of the cache (used to filter transactions we saw earlier)
-cache_size = 30000
+cache_size = ${CACHE_SIZE:-10000}
 
 ##### consensus configuration options #####
 [consensus]
 
-wal_file = "data/cs.wal/wal"
+wal_file = "${WAL_FILE:-data/cs.wal/wal}"
 
-timeout_propose = "3s"
-timeout_propose_delta = "500ms"
-timeout_prevote = "1s"
-timeout_prevote_delta = "500ms"
-timeout_precommit = "1s"
-timeout_precommit_delta = "500ms"
-timeout_commit = "5s"
+timeout_propose = "${TIMEOUT_PROPOSE:-3s}"
+timeout_propose_delta = "${TIMEOUT_PROPOSE_DELTA:-500ms}"
+timeout_prevote = "${TIMEOUT_PREVOTE:-1s}"
+timeout_prevote_delta = "${TIMEOUT_PREVOTE_DELTA:-500ms}"
+timeout_precommit = "${TIMEOUT_PRECOMMIT:-1s}"
+timeout_precommit_delta = "${TIMEOUT_PRECOMMIT_DELTA:-500ms}"
+timeout_commit = "${TIMEOUT_COMMIT:-5s}"
 
 # Make progress as soon as we have all the precommits (as if TimeoutCommit = 0)
-skip_timeout_commit = false
+skip_timeout_commit = ${SKIP_TIMEOUT_COMMIT:-false}
 
 # EmptyBlocks mode and possible interval between empty blocks
-create_empty_blocks = true
-create_empty_blocks_interval = "0s"
+create_empty_blocks = ${CREATE_EMPTY_BLOCKS:-true}
+create_empty_blocks_interval = "${CREATE_EMPTY_BLOCKS_INTERVAL:-0s}"
 
 # Reactor sleep duration parameters
-peer_gossip_sleep_duration = "100ms"
-peer_query_maj23_sleep_duration = "2s"
+peer_gossip_sleep_duration = "${PEER_GOSSIP_SLEEP_DURATION:-100ms}"
+peer_query_maj23_sleep_duration = "${PEER_QUERY_MAJ23_SLEEP_DURATION:-2s}"
 
 # Block time parameters. Corresponds to the minimum time increment between consecutive blocks.
 blocktime_iota = "1s"
@@ -238,7 +254,7 @@ blocktime_iota = "1s"
 # Options:
 #   1) "null"
 #   2) "kv" (default) - the simplest possible indexer, backed by key-value storage (defaults to levelDB; see DBBackend).
-indexer = "kv"
+indexer = "${INDEXED:-kv}"
 
 # Comma-separated list of tags to index (by default the only tag is "tx.hash")
 #
@@ -255,7 +271,7 @@ index_tags = "action,tx.height"
 # Note this may be not desirable (see the comment above). IndexTags has a
 # precedence over IndexAllTags (i.e. when given both, IndexTags will be
 # indexed).
-index_all_tags = false
+index_all_tags = ${INDEX_ALL_TAGS:-true}
 
 ##### instrumentation configuration options #####
 [instrumentation]
