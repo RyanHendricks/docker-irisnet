@@ -28,7 +28,7 @@ cat > config.toml << EOF
 
 # TCP or UNIX socket address of the ABCI application,
 # or the name of an ABCI application compiled in with the Tendermint binary
-proxy_app = "tcp://127.0.0.1:${PROXY_APP_PORT:-26658}"
+proxy_app = "tcp://0.0.0.0:${PROXY_APP_PORT:-26658}"
 
 # A custom human readable name for this node
 moniker = "${MONIKER:-iris_moniker}"
@@ -177,10 +177,10 @@ flush_throttle_timeout = "${FLUSH_THROTTLE_TIMEOUT:-100ms}"
 max_packet_msg_payload_size = ${MAX_PACKET_MSG_PAYLOAD_SIZE:-1000}
 
 # Rate at which packets can be sent, in bytes/second
-send_rate = ${SEND_RATE:-10280000}
+send_rate = ${SEND_RATE:-5120000}
 
 # Rate at which packets can be received, in bytes/second
-recv_rate = ${RECV_RATE:-10280000}
+recv_rate = ${RECV_RATE:-5120000}
 
 # Set true to enable the peer-exchange reactor
 pex = ${PEX:-true}
@@ -263,7 +263,7 @@ indexer = "${INDEXED:-kv}"
 # It's recommended to index only a subset of tags due to possible memory
 # bloat. This is, of course, depends on the indexer's DB and the volume of
 # transactions.
-index_tags = "action,tx.height"
+# index_tags = "action,tx.height"
 
 # When set to true, tells indexer to index all tags (predefined tags:
 # "tx.hash", "tx.height" and all tags from DeliverTx responses).
