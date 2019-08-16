@@ -158,10 +158,6 @@ addr_book_file = "${ADDR_BOOK_FILE:-config/addrbook.json}"
 
 # Set true for strict address routability rules
 # Set false for private or local networks
-addr_book_strict = false
-
-# Set true for strict address routability rules
-# Set false for private or local networks
 addr_book_strict = ${ADDR_BOOK_STRICT:-false}
 
 # Maximum number of inbound peers
