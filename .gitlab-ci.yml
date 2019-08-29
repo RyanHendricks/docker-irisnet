@@ -2,7 +2,7 @@ services:
   - docker:dind
 
 variables:
-  VERSION: "v0.14.1"
+  VERSION: "v0.15.1"
   IMAGE_TAG: $CI_REGISTRY_IMAGE
 
 before_script:

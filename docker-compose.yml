@@ -2,15 +2,24 @@ version: '3'
 
 services:
   irisnet:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: iris-node
+    environment: 
+      - MONIKER=Irishub
+      - CHAIN_ID=irishub
+      - BOOTSTRAP=FALSE
+      - IRIS_HOME=/.iris
+      - SEEDS=40821d0ade83d582b29d748f37ecf7bef0a823d0@tokenphi.com:26656
+      # - GENESIS_URL=
+    restart: always
     ports:
       - "26656:26656"
       - "26657:26657"
       - "26658:26658"
-      - "6060:6060"
-    restart: always
-    # volumes:
-      # - ./data/irisnet:/data/irisnet
-      # - ./data:/.iris/data
-      # - ./data/chaindata:/chaindata
+      - "1317:1317" # for rest-server
+    volumes:
+      - iris-data:/.iris
+volumes:
+  iris-data:
