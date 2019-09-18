@@ -1,6 +1,5 @@
-FROM golang:alpine AS build-env
+FROM golang:1.12.7-alpine AS build-env
 
-# Modified from original cosmos-sdk Dockerfile
 
 ENV PACKAGES curl make git libc-dev bash gcc linux-headers eudev-dev
 ENV VERSION=v0.15.1
