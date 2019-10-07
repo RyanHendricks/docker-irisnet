@@ -1,8 +1,8 @@
-FROM golang:1.12.7-alpine AS build-env
+FROM golang:1.12.9-alpine AS build-env
 
 
 ENV PACKAGES curl make git libc-dev bash gcc linux-headers eudev-dev
-ENV VERSION=v0.15.1
+ENV VERSION=v0.15.3
 
 # Set up dependencies
 RUN apk add --no-cache $PACKAGES
