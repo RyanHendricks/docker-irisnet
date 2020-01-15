@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   irisnet:
@@ -6,13 +6,19 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: iris-node
-    environment: 
+    environment:
       - MONIKER=Irishub
       - CHAIN_ID=irishub
       - BOOTSTRAP=FALSE
       - IRIS_HOME=/.iris
-      - SEEDS=40821d0ade83d582b29d748f37ecf7bef0a823d0@tokenphi.com:26656
-      # - GENESIS_URL=
+      - SEEDS=6a6de770deaa4b8c061dffd82e9c7f4d40c2165d@seed-1.mainnet.irisnet.org:26656,a17d7923293203c64ba75723db4d5f28e642f469@seed-2.mainnet.irisnet.org:26656, 595cef3914b6dfe3846f7694892e3d1e32dadfbc@35.196.175.11:36656
+      - PERSISTENT_PEERS=6a6de770deaa4b8c061dffd82e9c7f4d40c2165d@seed-1.mainnet.irisnet.org:26656,a17d7923293203c64ba75723db4d5f28e642f469@seed-2.mainnet.irisnet.org:26656, 595cef3914b6dfe3846f7694892e3d1e32dadfbc@35.196.175.11:36656
+      - PROMETHEUS_LISTEN_ADDR=36660
+      - MAX_OPEN_CONNECTIONS=10
+      - LCD_PORT=3317
+      - RPC_PORT=36657
+      - P2P_PORT=36656
+      - PROXY_APP_PORT=56658
     restart: always
     ports:
       - "26656:26656"
