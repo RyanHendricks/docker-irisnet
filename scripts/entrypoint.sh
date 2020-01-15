@@ -28,7 +28,7 @@ cat > config.toml << EOF
 
 # TCP or UNIX socket address of the ABCI application,
 # or the name of an ABCI application compiled in with the Tendermint binary
-proxy_app = "tcp://0.0.0.0:${PROXY_APP_PORT:-26658}"
+proxy_app = "${PROXY_APP:-tcp://0.0.0.0}:${PROXY_APP_PORT:-26658}"
 
 # A custom human readable name for this node
 moniker = "${MONIKER:-iris_moniker}"
@@ -93,7 +93,7 @@ filter_peers = false
 [rpc]
 
 # TCP or UNIX socket address for the RPC server to listen on
-laddr = "tcp://0.0.0.0:${RPC_LADDR_PORT:-26657}"
+laddr = "${RPC_LADDR:-tcp://0.0.0.0}:${RPC_PORT:-26657}"
 
 # A list of origins a cross-domain request can be executed from
 # Default value '[]' disables cors support
@@ -135,7 +135,7 @@ max_open_connections = ${GRPC_MAX_OPEN_CONNECTIONS:-900}
 [p2p]
 
 # Address to listen for incoming connections
-laddr = "tcp://0.0.0.0:${CONNECTIONS_LADDR_PORT:-26656}"
+laddr = "${P2P_LADDR:-tcp://0.0.0.0}:${P2P_PORT:-26656}"
 
 
 # Address to advertise to peers for them to dial
@@ -250,7 +250,7 @@ blocktime_iota = "1s"
 # Options:
 #   1) "null"
 #   2) "kv" (default) - the simplest possible indexer, backed by key-value storage (defaults to levelDB; see DBBackend).
-indexer = "${INDEXED:-kv}"
+indexer = "${INDEXER_SELECTION:-kv}"
 
 # Comma-separated list of tags to index (by default the only tag is "tx.hash")
 #
