@@ -18,13 +18,15 @@ services:
       - LCD_PORT=3317
       - RPC_PORT=36657
       - P2P_PORT=36656
-      - PROXY_APP_PORT=56658
+      - PROXY_APP_PORT=36658
+      - SEND_RATE=4096
+      - RECV_RATE=4096
     restart: always
     ports:
-      - "26656:26656"
-      - "26657:26657"
-      - "26658:26658"
-      - "1317:1317" # for rest-server
+      - "36656:36656"
+      - "36657:36657"
+      - "36658:36658"
+      - "3317:3317" # for rest-server
     volumes:
       - iris-data:/.iris
 volumes:
