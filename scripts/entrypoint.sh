@@ -278,7 +278,7 @@ index_all_tags = ${INDEX_ALL_TAGS:-true}
 prometheus = ${PROMETHEUS:-false}
 
 # Address to listen for Prometheus collector(s) connections
-prometheus_listen_addr = ":${PROMETHEUS_PORT:-26660}"
+prometheus_listen_addr = ":${PROMETHEUS_LISTEN_ADDR:-26660}"
 
 # Maximum number of simultaneous connections.
 # If you want to accept a larger number than the default, make sure
@@ -309,7 +309,7 @@ if [ ! -z "$LCD_PORT" ]; then
 
 cat > supervisor-irislcd.conf << EOF
 [program:irislcd]
-command=irislcd start --laddr tcp://0.0.0.0:${LCD_PORT:-1317} --home=${IRIS_HOME:-/.iris} --chain-id=${CHAIN_ID:-irishub} --trust-node --node=tcp://0.0.0.0:${RPC_LADDR_PORT:-26657} --cors="${CORS_ALLOWED_ORIGINS:-*}"
+command=irislcd start --laddr tcp://0.0.0.0:${LCD_PORT:-1317} --home=${IRIS_HOME:-/.iris} --chain-id=${CHAIN_ID:-irishub} --trust-node --node=${RPC_LADDR:-tcp://0.0.0.0}:${RPC_PORT:-26657}
 redirect_stderr=true
 EOF
 
