@@ -296,8 +296,8 @@ EOF
 
     if [ "$BOOTSTRAP" == "TRUE" ]; then
       echo "Downloading data archive and bootstrapping node.. This may take some time..."
-      wget https://storage.googleapis.com/node-bootstraps/irishub.tar.lz4
-      lz4 -d -v --rm irishub.20190823.0425.tar.lz4 | tar xf -
+      wget http://quicksync.chainlayer.io/iris/irishub.20200128.0305.tar.lz4
+      lz4 -d -v --rm irishub.20200128.0305.tar.lz4 | tar xf -
     fi
 
 fi
