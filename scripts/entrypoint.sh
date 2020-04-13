@@ -17,13 +17,10 @@ if [ ! -f "$IRIS_HOME/config/config.toml" ]; then
   if [ ! -z "$GENESIS_URL" ]; then
       wget $GENESIS_URL
     else
-      wget https://raw.githubusercontent.com/irisnet/betanet/master/config/genesis.json
+      wget https://raw.githubusercontent.com/irisnet/mainnet/master/config/genesis.json
   fi
 
 cat > config.toml << EOF
-# This is a TOML config file.
-# For more information, see https://github.com/toml-lang/toml
-
 ##### main base config options #####
 
 # TCP or UNIX socket address of the ABCI application,
@@ -41,10 +38,21 @@ fast_sync = ${FAST_SYNC:-true}
 # If the blockchain is deprecated, run node with Deprecated will
 # work in query only mode. Consensus engine and p2p gossip will be
 # shutdown
-deprecated = false
+deprecated = ${DEPRECATED:-false}
 
-# Database backend: leveldb | memdb | cleveldb
-db_backend = "${DB_BACKEND:-leveldb}"
+# Database backend: goleveldb | cleveldb | boltdb
+# * goleveldb (github.com/syndtr/goleveldb - most popular implementation)
+#   - pure go
+#   - stable
+# * cleveldb (uses levigo wrapper)
+#   - fast
+#   - requires gcc
+#   - use cleveldb build tag (go build -tags cleveldb)
+# * boltdb (uses etcd's fork of bolt - github.com/etcd-io/bbolt)
+#   - EXPERIMENTAL
+#   - may be faster is some use-cases (random reads - indexer)
+#   - use boltdb build tag (go build -tags boltdb)
+db_backend = "${DB_BACKEND:-goleveldb}"
 
 # Database directory
 db_dir = "${DB_DIR:-data}"
@@ -85,7 +93,7 @@ prof_laddr = "${PROF_LADDR:-localhost:6060}"
 
 # If true, query the ABCI app on connecting to a new peer
 # so the app can decide if we should keep the connection or not
-filter_peers = false
+filter_peers = ${FILTER_PEERS:-false}
 
 ##### advanced configuration options #####
 
@@ -129,7 +137,7 @@ unsafe = ${UNSAFE:-false}
 # 0 - unlimited.
 # Should be < {ulimit -Sn} - {MaxNumInboundPeers} - {MaxNumOutboundPeers} - {N of wal, db and other open files}
 # 1024 - 40 - 10 - 50 = 924 = ~900
-max_open_connections = ${GRPC_MAX_OPEN_CONNECTIONS:-900}
+max_open_connections = ${GRPC_MAX_OPEN_CONNECTIONS_WS:-900}
 
 ##### peer to peer configuration options #####
 [p2p]
@@ -145,7 +153,7 @@ laddr = "${P2P_LADDR:-tcp://0.0.0.0}:${P2P_PORT:-26656}"
 external_address = "${EXTERNAL_ADDRESS:-}"
 
 # Comma separated list of seed nodes to connect to
-seeds = "${SEEDS:-6a6de770deaa4b8c061dffd82e9c7f4d40c2165d@seed-1.mainnet.irisnet.org:26656,a17d7923293203c64ba75723db4d5f28e642f469@seed-2.mainnet.irisnet.org:26656}"
+seeds = "${SEEDS:-}"
 
 # Comma separated list of nodes to keep persistent connections to
 persistent_peers = "${PERSISTENT_PEERS:-}"
@@ -164,13 +172,13 @@ addr_book_strict = ${ADDR_BOOK_STRICT:-false}
 max_num_inbound_peers = ${MAX_NUM_INBOUND_PEERS:-40}
 
 # Maximum number of outbound peers to connect to, excluding persistent peers
-max_num_outbound_peers = ${MAX_NUM_OUTBOUND_PEERS:-40}
+max_num_outbound_peers = ${MAX_NUM_OUTBOUND_PEERS:-10}
 
 # Time to wait before flushing messages out on the connection
 flush_throttle_timeout = "${FLUSH_THROTTLE_TIMEOUT:-100ms}"
 
 # Maximum size of a message packet payload, in bytes
-max_packet_msg_payload_size = ${MAX_PACKET_MSG_PAYLOAD_SIZE:-1000}
+max_packet_msg_payload_size = ${MAX_PACKET_MSG_PAYLOAD_SIZE:-1024}
 
 # Rate at which packets can be sent, in bytes/second
 send_rate = ${SEND_RATE:-5120000}
@@ -284,7 +292,7 @@ prometheus_listen_addr = ":${PROMETHEUS_LISTEN_ADDR:-26660}"
 # If you want to accept a larger number than the default, make sure
 # you increase your OS limits.
 # 0 - unlimited.
-max_open_connections = ${MAX_OPEN_CONNECTIONS:-9}
+max_open_connections = ${MAX_OPEN_CONNECTIONS:-3}
 
 # Instrumentation namespace
 namespace = "${INSTRUMENTATION_NAMESPACE:-tendermint}"
@@ -295,9 +303,10 @@ EOF
   cd $IRIS_HOME
 
     if [ "$BOOTSTRAP" == "TRUE" ]; then
-      echo "Downloading data archive and bootstrapping node.. This may take some time..."
-      wget http://quicksync.chainlayer.io/iris/irishub.20200128.0305.tar.lz4
-      lz4 -d -v --rm irishub.20200128.0305.tar.lz4 | tar xf -
+      echo "Downloading data archive and bootstrapping node.. Thank you to @chainlayer.io for the public bootstraps"
+      echo "This may take quite some time..."
+      wget http://quicksync.chainlayer.io/iris/irishub.20200413.0305.tar.lz4
+      lz4 -d -v --rm irishub.20200413.0305.tar.lz4 | tar xf -
     fi
 
 fi
