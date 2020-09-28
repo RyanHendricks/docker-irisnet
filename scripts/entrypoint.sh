@@ -305,8 +305,8 @@ EOF
     if [ "$BOOTSTRAP" == "TRUE" ]; then
       echo "Downloading data archive and bootstrapping node.. Thank you to @chainlayer.io for the public bootstraps"
       echo "This may take quite some time..."
-      wget http://quicksync.chainlayer.io/iris/irishub.20200413.0305.tar.lz4
-      lz4 -d -v --rm irishub.20200413.0305.tar.lz4 | tar xf -
+      wget http://quicksync.chainlayer.io/iris/irishub.20200820.0305.tar.lz4
+      lz4 -d -v --rm irishub.20200820.0305.tar.lz4 | tar xf -
     fi
 
 fi
