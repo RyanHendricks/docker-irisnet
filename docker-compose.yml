@@ -7,15 +7,12 @@ services:
       dockerfile: Dockerfile
     container_name: iris-node
     environment:
-      - MONIKER=IrisSandstone
+      - MONIKER=Sandstone
       - CHAIN_ID=irishub
-      - BOOTSTRAP=FALSE
       - IRIS_HOME=/.iris
-      - GENESIS_URL=https://raw.githubusercontent.com/irisnet/mainnet/master/config/genesis.json
       - SEEDS=a17d7923293203c64ba75723db4d5f28e642f469@34.80.238.129:26656,363430f2533f0b284c156e846b6934bb7e09ea82@35.221.235.168:26656,9113c60ba379fa61b47058b671bebd137542e0ef@35.201.168.140:26656,6a6de770deaa4b8c061dffd82e9c7f4d40c2165d@47.101.79.149:26656
       - PERSISTENT_PEERS=a17d7923293203c64ba75723db4d5f28e642f469@34.80.238.129:26656,363430f2533f0b284c156e846b6934bb7e09ea82@35.221.235.168:26656,9113c60ba379fa61b47058b671bebd137542e0ef@35.201.168.140:26656,6a6de770deaa4b8c061dffd82e9c7f4d40c2165d@47.101.79.149:26656
       # - PROMETHEUS_LISTEN_ADDR=36660
-      - MAX_OPEN_CONNECTIONS=10
       # - LCD_PORT=3317
       # - RPC_PORT=36657
       # - P2P_PORT=36656

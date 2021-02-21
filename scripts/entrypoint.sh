@@ -1,57 +1,59 @@
 #!/bin/sh
 
-
 # exit script on any error
 set -e
 echo "setting up initial configurations"
 
-
 if [ ! -f "$IRIS_HOME/config/config.toml" ]; then
-  # mkdir /.iris
-  iris init --moniker=${MONIKER:-iris_moniker} --home=${IRIS_HOME:-/.iris} --chain-id=${CHAIN_ID:-irishub}
-  cd $IRIS_HOME/config/
 
-  rm genesis.json
-  rm config.toml
+	iris init "${MONIKER:-nonamenode}" --home="${IRIS_HOME:-/.iris}"
 
-  if [ ! -z "$GENESIS_URL" ]; then
-      wget $GENESIS_URL
-    else
-      wget https://raw.githubusercontent.com/irisnet/mainnet/master/config/genesis.json
-  fi
+	cd "$IRIS_HOME/config"
 
-cat > config.toml << EOF
-##### main base config options #####
+	rm genesis.json
+	rm config.toml
+	rm app.toml
+
+	if [ -f "genesis.json.zip" ]; then
+      ls
+      echo "removing existing genesis file dl archive"
+			rm "genesis.json.zip"
+	fi
+
+	if [ ! -z "$GENESIS_URL" ]; then
+		wget "$GENESIS_URL"
+	else
+		wget https://github.com/irisnet/testnets/raw/master/bifrost/sim-upgrade/genesis.json.zip
+		unzip -o genesis.json.zip
+		rm genesis.json.zip
+	fi
+
+	cat >config.toml <<EOF
+# This is a TOML config file.
+# For more information, see https://github.com/toml-lang/toml
+
+# NOTE: Any path below can be absolute (e.g. "/var/myawesomeapp/data") or
+# relative to the home directory (e.g. "data"). The home directory is
+# "$HOME/.tendermint" by default, but could be changed via $TMHOME env variable
+# or --home cmd flag.
+
+#######################################################################
+###                   Main Base Config Options                      ###
+#######################################################################
 
 # TCP or UNIX socket address of the ABCI application,
 # or the name of an ABCI application compiled in with the Tendermint binary
-proxy_app = "${PROXY_APP:-tcp://0.0.0.0}:${PROXY_APP_PORT:-26658}"
+proxy_app = "${PROXY_APP_LADDR:-tcp://0.0.0.0}:${PROXY_APP_PORT:-26658}"
 
 # A custom human readable name for this node
-moniker = "${MONIKER:-iris_moniker}"
+moniker = "${MONIKER:-moniker}"
 
 # If this node is many blocks behind the tip of the chain, FastSync
 # allows them to catchup quickly by downloading blocks in parallel
 # and verifying their commits
 fast_sync = ${FAST_SYNC:-true}
 
-# If the blockchain is deprecated, run node with Deprecated will
-# work in query only mode. Consensus engine and p2p gossip will be
-# shutdown
-deprecated = ${DEPRECATED:-false}
-
-# Database backend: goleveldb | cleveldb | boltdb
-# * goleveldb (github.com/syndtr/goleveldb - most popular implementation)
-#   - pure go
-#   - stable
-# * cleveldb (uses levigo wrapper)
-#   - fast
-#   - requires gcc
-#   - use cleveldb build tag (go build -tags cleveldb)
-# * boltdb (uses etcd's fork of bolt - github.com/etcd-io/bbolt)
-#   - EXPERIMENTAL
-#   - may be faster is some use-cases (random reads - indexer)
-#   - use boltdb build tag (go build -tags boltdb)
+# Database backend: leveldb | memdb | cleveldb
 db_backend = "${DB_BACKEND:-goleveldb}"
 
 # Database directory
@@ -60,23 +62,18 @@ db_dir = "${DB_DIR:-data}"
 # Output level for logging, including package level options
 log_level = "${LOG_LEVEL:-main:info,state:info,*:error}"
 
-# Output format: 'plain' (colored text) or 'json'
-log_format = "plain"
+log_format = "${LOG_FORMAT:-plain}"
 
 ##### additional base config options #####
 
 # Path to the JSON file containing the initial validator set and other meta data
 genesis_file = "${GENESIS_FILE:-config/genesis.json}"
 
-## WILL BE DEPRECATED ##
 # Path to the JSON file containing the private key to use as a validator in the consensus protocol
-priv_validator_file = "config/priv_validator.json"
-
-# Path to the JSON file containing the private key to use as a validator in the consensus protocol
-# priv_validator_key_file = "${PRIV_VALIDATOR_KEY_FILE:-config/priv_validator_key.json}"
+priv_validator_key_file = "${PRIV_VALIDATOR_KEY_FILE:-config/priv_validator_key.json}"
 
 # Path to the JSON file containing the last sign state of a validator
-# priv_validator_state_file = "${PRIV_VALIDATOR_KEY_FILE:-data/priv_validator_state.json}"
+priv_validator_state_file = "${PRIV_VALIDATOR_KEY_FILE:-data/priv_validator_state.json}"
 
 # TCP or UNIX socket address for Tendermint to listen on for
 # connections from an external PrivValidator process
@@ -88,16 +85,18 @@ node_key_file = "${NODE_KEY_FILE:-config/node_key.json}"
 # Mechanism to connect to the ABCI application: socket | grpc
 abci = "${ABCI:-socket}"
 
-# TCP or UNIX socket address for the profiling server to listen on
-prof_laddr = "${PROF_LADDR:-localhost:6060}"
-
 # If true, query the ABCI app on connecting to a new peer
 # so the app can decide if we should keep the connection or not
 filter_peers = ${FILTER_PEERS:-false}
 
-##### advanced configuration options #####
 
-##### rpc server configuration options #####
+#######################################################################
+###                 Advanced Configuration Options                  ###
+#######################################################################
+
+#######################################################
+###       RPC Server Configuration Options          ###
+#######################################################
 [rpc]
 
 # TCP or UNIX socket address for the RPC server to listen on
@@ -106,13 +105,13 @@ laddr = "${RPC_LADDR:-tcp://0.0.0.0}:${RPC_PORT:-26657}"
 # A list of origins a cross-domain request can be executed from
 # Default value '[]' disables cors support
 # Use '["*"]' to allow any origin
-cors_allowed_origins = ["${CORS_ALLOWED_ORIGINS:-*}"]
+cors_allowed_origins = ["*"]
 
 # A list of methods the client is allowed to use with cross-domain requests
-cors_allowed_methods = ["HEAD", "GET", "POST", ]
+cors_allowed_methods = ["HEAD", "GET", "POST"]
 
 # A list of non simple headers the client is allowed to use with cross-domain requests
-cors_allowed_headers = ["Origin", "Accept", "Content-Type", "X-Requested-With", "X-Server-Time", ]
+cors_allowed_headers = ["Origin", "Accept", "Content-Type", "X-Requested-With", "X-Server-Time"]
 
 # TCP or UNIX socket address for the gRPC server to listen on
 # NOTE: This server only supports /broadcast_tx_commit
@@ -137,14 +136,56 @@ unsafe = ${UNSAFE:-false}
 # 0 - unlimited.
 # Should be < {ulimit -Sn} - {MaxNumInboundPeers} - {MaxNumOutboundPeers} - {N of wal, db and other open files}
 # 1024 - 40 - 10 - 50 = 924 = ~900
-max_open_connections = ${GRPC_MAX_OPEN_CONNECTIONS_WS:-900}
+max_open_connections = ${RPC_MAX_OPEN_CONNECTIONS:-900}
 
-##### peer to peer configuration options #####
+# Maximum number of unique clientIDs that can /subscribe
+# If you're using /broadcast_tx_commit, set to the estimated maximum number
+# of broadcast_tx_commit calls per block.
+max_subscription_clients = ${MAX_SUBSCRIPTION_CLIENTS:-100}
+
+# Maximum number of unique queries a given client can /subscribe to
+# If you're using GRPC (or Local RPC client) and /broadcast_tx_commit, set to
+# the estimated # maximum number of broadcast_tx_commit calls per block.
+max_subscriptions_per_client = ${MAX_SUBSCRIPTION_PER_CLIENT:-5}
+
+# How long to wait for a tx to be committed during /broadcast_tx_commit.
+# WARNING: Using a value larger than 10s will result in increasing the
+# global HTTP write timeout, which applies to all connections and endpoints.
+# See https://github.com/tendermint/tendermint/issues/3435
+timeout_broadcast_tx_commit = "${TIMEOUT_BROADCAST_TX_COMMIT:-10s}"
+
+# Maximum size of request body, in bytes
+max_body_bytes = ${MAX_SIZE_REQUEST_BODY:-1000000}
+
+# Maximum size of request header, in bytes
+max_header_bytes = ${MAX_SIZE_REQUEST_HEADER:-1048576}
+
+# The path to a file containing certificate that is used to create the HTTPS server.
+# Might be either absolute path or path related to Tendermint's config directory.
+# If the certificate is signed by a certificate authority,
+# the certFile should be the concatenation of the server's certificate, any intermediates,
+# and the CA's certificate.
+# NOTE: both tls_cert_file and tls_key_file must be present for Tendermint to create HTTPS server.
+# Otherwise, HTTP server is run.
+tls_cert_file = "${TLS_CERT_FILE:-}"
+
+# The path to a file containing matching private key that is used to create the HTTPS server.
+# Might be either absolute path or path related to Tendermint's config directory.
+# NOTE: both tls-cert-file and tls-key-file must be present for Tendermint to create HTTPS server.
+# Otherwise, HTTP server is run.
+tls_key_file = "${TLS_KEY_FILE:-}"
+
+# pprof listen address (https://golang.org/pkg/net/http/pprof)
+prof_laddr = "${PROF_LADDR:-localhost:6060}"
+
+#######################################################
+###           P2P Configuration Options             ###
+#######################################################
 [p2p]
 
 # Address to listen for incoming connections
-laddr = "${P2P_LADDR:-tcp://0.0.0.0}:${P2P_PORT:-26656}"
 
+laddr = "${P2P_LADDR:-tcp://0.0.0.0}:${P2P_PORT:-26656}"
 
 # Address to advertise to peers for them to dial
 # If empty, will use the same port as the laddr,
@@ -166,13 +207,19 @@ addr_book_file = "${ADDR_BOOK_FILE:-config/addrbook.json}"
 
 # Set true for strict address routability rules
 # Set false for private or local networks
-addr_book_strict = ${ADDR_BOOK_STRICT:-false}
+addr_book_strict = ${ADDR_BOOK_STRICT:-true}
 
 # Maximum number of inbound peers
 max_num_inbound_peers = ${MAX_NUM_INBOUND_PEERS:-40}
 
 # Maximum number of outbound peers to connect to, excluding persistent peers
 max_num_outbound_peers = ${MAX_NUM_OUTBOUND_PEERS:-10}
+
+# List of node IDs, to which a connection will be (re)established ignoring any existing limits
+unconditional_peer_ids = "${UNCONDITIONAL_PEER_IDS:-}"
+
+# Maximum pause when redialing a persistent peer (if zero, exponential backoff is used)
+persistent_peers_max_dial_period = "${PERSISTENT_PEERS_MAX_DIAL_PERIOD:-0s}"
 
 # Time to wait before flushing messages out on the connection
 flush_throttle_timeout = "${FLUSH_THROTTLE_TIMEOUT:-100ms}"
@@ -199,31 +246,90 @@ seed_mode = ${SEED_MODE:-false}
 private_peer_ids = "${PRIVATE_PEER_IDS:-}"
 
 # Toggle to disable guard against peers connecting from the same ip.
-allow_duplicate_ip = ${ALLOW_DUPLICATE_IP:-true}
+allow_duplicate_ip = ${ALLOW_DUPLICATE_IP:-false}
 
 # Peer connection configuration.
 handshake_timeout = "${HANDSHAKE_TIMEOUT:-20s}"
 dial_timeout = "${DIAL_TIMEOUT:-3s}"
 
-##### mempool configuration options #####
+#######################################################
+###          Mempool Configuration Option          ###
+#######################################################
 [mempool]
 
 recheck = ${RECHECK:-true}
 broadcast = ${BROADCAST:-true}
 wal_dir = "${WAL_DIR}"
 
-# size of the mempool
+# Maximum number of transactions in the mempool
 size = ${SIZE_OF_MEMPOOL:-5000}
 
+# Limit the total size of all txs in the mempool.
 # This only accounts for raw transactions (e.g. given 1MB transactions and
 # max_txs_bytes=5MB, mempool will only accept 5 transactions).
 max_txs_bytes = ${MAX_TXS_BYTES:-1073741824}
 
-
-# size of the cache (used to filter transactions we saw earlier)
+# Size of the cache (used to filter transactions we saw earlier) in transactions
 cache_size = ${CACHE_SIZE:-10000}
 
-##### consensus configuration options #####
+# Do not remove invalid transactions from the cache (default: false)
+# Set to true if it's not possible for any invalid transaction to become valid
+# again in the future.
+keep-invalid-txs-in-cache = false
+
+
+# Maximum size of a single transaction.
+# NOTE: the max size of a tx transmitted over the network is {max_tx_bytes}.
+max_tx_bytes = ${MAX_TX_BYTES:-1048576}
+
+# Maximum size of a batch of transactions to send to a peer
+# Including space needed by encoding (one varint per transaction).
+# XXX: Unused due to https://github.com/tendermint/tendermint/issues/5796
+max_batch_bytes = ${MAX_BATCH_BYTES:-0}
+
+#######################################################
+###         State Sync Configuration Options        ###
+#######################################################
+[statesync]
+# State sync rapidly bootstraps a new node by discovering, fetching, and restoring a state machine
+# snapshot from peers instead of fetching and replaying historical blocks. Requires some peers in
+# the network to take and serve state machine snapshots. State sync is not attempted if the node
+# has any local state (LastBlockHeight > 0). The node will have a truncated block history,
+# starting from the height of the snapshot.
+enable = ${STATE_SYNC_ENABLE:-false}
+
+# RPC servers (comma-separated) for light client verification of the synced state machine and
+# retrieval of state data for node bootstrapping. Also needs a trusted height and corresponding
+# header hash obtained from a trusted source, and a period during which validators can be trusted.
+#
+# For Cosmos SDK-based chains, trust_period should usually be about 2/3 of the unbonding time (~2
+# weeks) during which they can be financially punished (slashed) for misbehavior.
+rpc_servers = ""
+trust_height = 0
+trust_hash = ""
+trust_period = "168h0m0s"
+
+# Time to spend discovering snapshots before initiating a restore.
+discovery_time = "15s"
+
+# Temporary directory for state sync snapshot chunks, defaults to the OS tempdir (typically /tmp).
+# Will create a new, randomly named directory within, and remove it when done.
+temp_dir = ""
+
+#######################################################
+###       Fast Sync Configuration Connections       ###
+#######################################################
+[fastsync]
+
+# Fast Sync version to use:
+#   1) "v0" (default) - the legacy fast sync implementation
+#   2) "v1" - refactor of v0 version for better testability
+#   2) "v2" - complete redesign of v0, optimized for testability & readability
+version = "${FAST_SYNC_VERSION:-v0}"
+
+#######################################################
+###         Consensus Configuration Options         ###
+#######################################################
 [consensus]
 
 wal_file = "${WAL_FILE:-data/cs.wal/wal}"
@@ -236,6 +342,12 @@ timeout_precommit = "${TIMEOUT_PRECOMMIT:-1s}"
 timeout_precommit_delta = "${TIMEOUT_PRECOMMIT_DELTA:-500ms}"
 timeout_commit = "${TIMEOUT_COMMIT:-5s}"
 
+# How many blocks to look back to check existence of the node's consensus votes before joining consensus
+# When non-zero, the node will panic upon restart
+# if the same consensus key was used to sign {double_sign_check_height} last blocks.
+# So, validators should stop the state machine, wait for some blocks, and then restart the state machine to avoid panic.
+double_sign_check_height = ${DOUBLE_SIGN_CHECK_HEIGHT:-0}
+
 # Make progress as soon as we have all the precommits (as if TimeoutCommit = 0)
 skip_timeout_commit = ${SKIP_TIMEOUT_COMMIT:-false}
 
@@ -247,37 +359,25 @@ create_empty_blocks_interval = "${CREATE_EMPTY_BLOCKS_INTERVAL:-0s}"
 peer_gossip_sleep_duration = "${PEER_GOSSIP_SLEEP_DURATION:-100ms}"
 peer_query_maj23_sleep_duration = "${PEER_QUERY_MAJ23_SLEEP_DURATION:-2s}"
 
-# Block time parameters. Corresponds to the minimum time increment between consecutive blocks.
-blocktime_iota = "1s"
-
-##### transactions indexer configuration options #####
+#######################################################
+###   Transaction Indexer Configuration Options     ###
+#######################################################
 [tx_index]
 
 # What indexer to use for transactions
 #
+# The application will set which txs to index. In some cases a node operator will be able
+# to decide which txs to index based on configuration set in the application.
+#
 # Options:
 #   1) "null"
 #   2) "kv" (default) - the simplest possible indexer, backed by key-value storage (defaults to levelDB; see DBBackend).
+# 		- When "kv" is chosen "tx.height" and "tx.hash" will always be indexed.
 indexer = "${INDEXER_SELECTION:-kv}"
 
-# Comma-separated list of tags to index (by default the only tag is "tx.hash")
-#
-# You can also index transactions by height by adding "tx.height" tag here.
-#
-# It's recommended to index only a subset of tags due to possible memory
-# bloat. This is, of course, depends on the indexer's DB and the volume of
-# transactions.
-# index_tags = "action,tx.height"
-
-# When set to true, tells indexer to index all tags (predefined tags:
-# "tx.hash", "tx.height" and all tags from DeliverTx responses).
-#
-# Note this may be not desirable (see the comment above). IndexTags has a
-# precedence over IndexAllTags (i.e. when given both, IndexTags will be
-# indexed).
-index_all_tags = ${INDEX_ALL_TAGS:-true}
-
-##### instrumentation configuration options #####
+#######################################################
+###       Instrumentation Configuration Options     ###
+#######################################################
 [instrumentation]
 
 # When true, Prometheus metrics are served under /metrics on
@@ -299,35 +399,163 @@ namespace = "${INSTRUMENTATION_NAMESPACE:-tendermint}"
 
 EOF
 
+	cat >app.toml <<EOF
+# This is a TOML config file.
+# For more information, see https://github.com/toml-lang/toml
 
-  cd $IRIS_HOME
+###############################################################################
+###                           Base Configuration                            ###
+###############################################################################
 
-    if [ "$BOOTSTRAP" == "TRUE" ]; then
-      echo "Downloading data archive and bootstrapping node.. Thank you to @chainlayer.io for the public bootstraps"
-      echo "This may take quite some time..."
-      wget http://quicksync.chainlayer.io/iris/irishub.20200820.0305.tar.lz4
-      lz4 -d -v --rm irishub.20200820.0305.tar.lz4 | tar xf -
-    fi
+# The minimum gas prices a validator is willing to accept for processing a
+# transaction. A transaction's fees must meet the minimum of any denomination
+# specified in this config (e.g. 0.25token1;0.0001token2).
+minimum-gas-prices = ""
 
-fi
+# default: the last 100 states are kept in addition to every 500th state; pruning at 10 block intervals
+# nothing: all historic states will be saved, nothing will be deleted (i.e. archiving node)
+# everything: all saved states will be deleted, storing only the current state; pruning at 10 block intervals
+# custom: allow pruning options to be manually specified through 'pruning-keep-recent', 'pruning-keep-every', and 'pruning-interval'
+pruning = "${PRUNING:-default}"
 
+# These are applied if and only if the pruning strategy is custom.
+pruning-keep-recent = "0"
+pruning-keep-every = "0"
+pruning-interval = "0"
 
-if [ ! -z "$LCD_PORT" ]; then
-    rm /etc/supervisor/conf.d/supervisor-irislcd.conf
-    cd /etc/supervisor/conf.d/
+# HaltHeight contains a non-zero block height at which a node will gracefully
+# halt and shutdown that can be used to assist upgrades and testing.
+#
+# Note: Commitment of state will be attempted on the corresponding block.
+halt-height = 0
 
-cat > supervisor-irislcd.conf << EOF
-[program:irislcd]
-command=irislcd start --laddr tcp://0.0.0.0:${LCD_PORT:-1317} --home=${IRIS_HOME:-/.iris} --chain-id=${CHAIN_ID:-irishub} --trust-node --node=${RPC_LADDR:-tcp://0.0.0.0}:${RPC_PORT:-26657}
-redirect_stderr=true
+# HaltTime contains a non-zero minimum block time (in Unix seconds) at which
+# a node will gracefully halt and shutdown that can be used to assist upgrades
+# and testing.
+#
+# Note: Commitment of state will be attempted on the corresponding block.
+halt-time = 0
+
+# MinRetainBlocks defines the minimum block height offset from the current
+# block being committed, such that all blocks past this offset are pruned
+# from Tendermint. It is used as part of the process of determining the
+# ResponseCommit.RetainHeight value during ABCI Commit. A value of 0 indicates
+# that no blocks should be pruned.
+#
+# This configuration value is only responsible for pruning Tendermint blocks.
+# It has no bearing on application state pruning which is determined by the
+# "pruning-*" configurations.
+#
+# Note: Tendermint block pruning is dependant on this parameter in conunction
+# with the unbonding (safety threshold) period, state pruning and state sync
+# snapshot parameters to determine the correct minimum value of
+# ResponseCommit.RetainHeight.
+min-retain-blocks = 0
+
+# InterBlockCache enables inter-block caching.
+inter-block-cache = true
+
+# IndexEvents defines the set of events in the form {eventType}.{attributeKey},
+# which informs Tendermint what to index. If empty, all events will be indexed.
+#
+# Example:
+# ["message.sender", "message.recipient"]
+index-events = [${INDEX_TAGS:-}]
+
+###############################################################################
+###                         Telemetry Configuration                         ###
+###############################################################################
+
+[telemetry]
+
+# Prefixed with keys to separate services.
+service-name = ""
+
+# Enabled enables the application telemetry functionality. When enabled,
+# an in-memory sink is also enabled by default. Operators may also enabled
+# other sinks such as Prometheus.
+enabled = false
+
+# Enable prefixing gauge values with hostname.
+enable-hostname = false
+
+# Enable adding hostname to labels.
+enable-hostname-label = false
+
+# Enable adding service to labels.
+enable-service-label = false
+
+# PrometheusRetentionTime, when positive, enables a Prometheus metrics sink.
+prometheus-retention-time = 0
+
+# GlobalLabels defines a global set of name/value label tuples applied to all
+# metrics emitted using the wrapper functions defined in telemetry package.
+#
+# Example:
+# [["chain_id", "cosmoshub-1"]]
+global-labels = [
+]
+
+###############################################################################
+###                           API Configuration                             ###
+###############################################################################
+
+[api]
+
+# Enable defines if the API server should be enabled.
+enable = ${API:-false}
+
+# Swagger defines if swagger documentation should automatically be registered.
+swagger = ${SWAGGER:-false}
+
+# Address defines the API server to listen on.
+address = "${API_LADDR:-tcp://0.0.0.0}:${API_PORT:-1317}"
+
+# MaxOpenConnections defines the number of maximum open connections.
+max-open-connections = 1000
+
+# RPCReadTimeout defines the Tendermint RPC read timeout (in seconds).
+rpc-read-timeout = 10
+
+# RPCWriteTimeout defines the Tendermint RPC write timeout (in seconds).
+rpc-write-timeout = 0
+
+# RPCMaxBodyBytes defines the Tendermint maximum response body (in bytes).
+rpc-max-body-bytes = 1000000
+
+# EnableUnsafeCORS defines if CORS should be enabled (unsafe - use it at your own risk).
+enabled-unsafe-cors = ${UNSAFE_CORS:-false}
+
+###############################################################################
+###                           gRPC Configuration                            ###
+###############################################################################
+
+[grpc]
+
+# Enable defines if the gRPC server should be enabled.
+enable = ${GRPC_ENABLE:-false}
+
+# Address defines the gRPC server address to bind to.
+address = "${GRPC_LADDR:-0.0.0.0:9090}"
+
+###############################################################################
+###                        State Sync Configuration                         ###
+###############################################################################
+
+# State sync snapshots allow other nodes to rapidly join the network without replaying historical
+# blocks, instead downloading and applying a snapshot of the application state at a given height.
+[state-sync]
+
+# snapshot-interval specifies the block interval at which local state sync snapshots are
+# taken (0 to disable). Must be a multiple of pruning-keep-every.
+snapshot-interval = 0
+
+# snapshot-keep-recent specifies the number of recent snapshots to keep and serve (0 to keep all).
+snapshot-keep-recent = 2
 EOF
 
+	cd "$IRIS_HOME"
+
 fi
 
-
-
-
 exec supervisord --nodaemon --configuration /etc/supervisor/supervisord.conf
-
-
-
