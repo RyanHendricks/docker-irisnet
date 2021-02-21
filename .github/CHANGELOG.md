@@ -1,12 +1,20 @@
 # Changelog
 
-## [v1.0.0](https://github.com/RyanHendricks/docker-irisnet/tree/v1.0.0) (2020-04-13)
+## [v1.0.1](https://github.com/RyanHendricks/docker-irisnet/tree/v1.0.1) (2021-02-21)
 
-[Full Changelog](https://github.com/RyanHendricks/docker-irisnet/compare/v1.0.0-rc1...v1.0.0)
+[Full Changelog](https://github.com/RyanHendricks/docker-irisnet/compare/v0.16.2...v1.0.1)
 
-## [v1.0.0-rc1](https://github.com/RyanHendricks/docker-irisnet/tree/v1.0.0-rc1) (2019-10-07)
+## [v0.16.2](https://github.com/RyanHendricks/docker-irisnet/tree/v0.16.2) (2020-04-13)
 
-[Full Changelog](https://github.com/RyanHendricks/docker-irisnet/compare/5f617cfbca5b128c3c22a05cb42c85398fef1fc3...v1.0.0-rc1)
+[Full Changelog](https://github.com/RyanHendricks/docker-irisnet/compare/v0.16.0...v0.16.2)
+
+## [v0.16.0](https://github.com/RyanHendricks/docker-irisnet/tree/v0.16.0) (2019-12-07)
+
+[Full Changelog](https://github.com/RyanHendricks/docker-irisnet/compare/v0.15.3...v0.16.0)
+
+## [v0.15.3](https://github.com/RyanHendricks/docker-irisnet/tree/v0.15.3) (2019-10-07)
+
+[Full Changelog](https://github.com/RyanHendricks/docker-irisnet/compare/5f617cfbca5b128c3c22a05cb42c85398fef1fc3...v0.15.3)
 
 
 
