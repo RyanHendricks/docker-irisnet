@@ -24,7 +24,7 @@ FROM alpine:edge
 ENV IRIS_HOME=/.iris
 
 # Install runtime dependencies
-RUN apk add --no-cache --update ca-certificates py3-setuptools supervisor wget lz4 unzip
+RUN apk add --no-cache --update ca-certificates py3-setuptools supervisor wget lz4
 
 # Create + enter a temp directory for copying binaries
 WORKDIR /tmp/bin

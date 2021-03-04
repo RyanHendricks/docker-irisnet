@@ -23,9 +23,7 @@ if [ ! -f "$IRIS_HOME/config/config.toml" ]; then
 	if [ ! -z "$GENESIS_URL" ]; then
 		wget "$GENESIS_URL"
 	else
-		wget https://github.com/irisnet/testnets/raw/master/bifrost/sim-upgrade/genesis.json.zip
-		unzip -o genesis.json.zip
-		rm genesis.json.zip
+		wget https://github.com/irisnet/mainnet/raw/master/config/genesis.json
 	fi
 
 	cat >config.toml <<EOF
