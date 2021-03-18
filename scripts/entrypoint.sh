@@ -58,7 +58,7 @@ db_backend = "${DB_BACKEND:-goleveldb}"
 db_dir = "${DB_DIR:-data}"
 
 # Output level for logging, including package level options
-log_level = "${LOG_LEVEL:-main:info,state:info,*:error}"
+log_level = "${LOG_LEVEL:-info}"
 
 log_format = "${LOG_FORMAT:-plain}"
 
