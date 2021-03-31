@@ -14,12 +14,6 @@ if [ ! -f "$IRIS_HOME/config/config.toml" ]; then
 	rm config.toml
 	rm app.toml
 
-	if [ -f "genesis.json.zip" ]; then
-      ls
-      echo "removing existing genesis file dl archive"
-			rm "genesis.json.zip"
-	fi
-
 	if [ ! -z "$GENESIS_URL" ]; then
 		wget "$GENESIS_URL"
 	else
@@ -58,7 +52,7 @@ db_backend = "${DB_BACKEND:-goleveldb}"
 db_dir = "${DB_DIR:-data}"
 
 # Output level for logging, including package level options
-log_level = "${LOG_LEVEL:-info}"
+log_level = "${LOG_LEVEL:-error}"
 
 log_format = "${LOG_FORMAT:-plain}"
 

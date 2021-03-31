@@ -3,7 +3,7 @@ jobs:
   build:
     environment:
       IMAGE_NAME: ryanhendricks/docker-irisnet
-      VERSION: v1.0.1
+      VERSION: v1.1.0
     docker:
       - image: circleci/buildpack-deps:stretch
     steps:

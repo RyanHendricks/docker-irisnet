@@ -21,7 +21,7 @@ services:
       - "26656:26656"
       - "26657:26657"
       - "26658:26658"
-      - "1317:1317" # for rest-server
+      - "1317:1317"
     volumes:
       - iris-data:/.iris
 volumes:
