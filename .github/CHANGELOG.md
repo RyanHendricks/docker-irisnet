@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.1.0](https://github.com/RyanHendricks/docker-irisnet/tree/v1.1.0) (2021-03-31)
+
+[Full Changelog](https://github.com/RyanHendricks/docker-irisnet/compare/v1.0.1...v1.1.0)
+
 ## [v1.0.1](https://github.com/RyanHendricks/docker-irisnet/tree/v1.0.1) (2021-02-21)
 
 [Full Changelog](https://github.com/RyanHendricks/docker-irisnet/compare/v0.16.2...v1.0.1)
