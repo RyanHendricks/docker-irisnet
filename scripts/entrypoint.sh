@@ -6,7 +6,7 @@ echo "setting up initial configurations"
 
 if [ ! -f "$IRIS_HOME/config/config.toml" ]; then
 
-	iris init "${MONIKER:-nonamenode}" --home="${IRIS_HOME:-/.iris}"
+	iris init "${MONIKER:-nonamenode}" --home="${IRIS_HOME:-/.iris}" --chain-id="${CHAIN_ID:-/.iris}"
 
 	cd "$IRIS_HOME/config"
 
